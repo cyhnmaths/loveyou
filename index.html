@@ -383,6 +383,22 @@
         </div>
     </section>
 
+    <!-- OYUN BÖLÜMÜ: SÜRPRİZ ŞANS ÇARKI -->
+    <section>
+        <div class="question-card">
+            <i class="fa-solid fa-dice" style="font-size: 2.5rem; color: var(--gold); margin-bottom: 15px;"></i>
+            <h2 style="font-size: 1.4rem; margin-bottom: 10px;">Sürpriz Şans Çarkı</h2>
+            <p style="color: var(--text-sub); font-size: 0.95rem; margin-bottom: 20px;">Bugün senin için hangi sürpriz var? Butona bas ve şansını dene! ✨</p>
+            
+            <!-- Çark Sonuç Alanı -->
+            <div id="wheelResult" style="min-height: 70px; background: rgba(0,0,0,0.3); border: 1px dashed var(--glass-border); border-radius: 16px; padding: 15px; display: flex; align-items: center; justify-content: center; color: var(--gold); font-weight: 600; font-size: 1rem; text-align: center; margin-bottom: 20px;">
+                "Şansımı Çevir" butonuna dokunarak sürprizini öğren! 🎁
+            </div>
+
+            <button class="btn btn-yes" onclick="spinWheel()" style="width: 100%;">Şansımı Çevir 🎡</button>
+        </div>
+    </section>
+
     <!-- BÖLÜM 2: EĞLENCELİ SORU -->
     <section>
         <div class="question-card">
@@ -507,7 +523,40 @@
             }, 400);
         }
 
-        /* 7. CANVAS BÜYÜLÜ PARÇACIKLAR */
+        /* 7. OYUN MANTIĞI: SÜRPRİZ ŞANS ÇARKI */
+        const surprises = [
+            "🎟️ 1 Adet Sınırsız Kahve / Tatlı Ismarlama Hakkı Kazandın!",
+            "🎬 Bu akşamki film seçimini veto yetkisi olmadan yapma hakkı!",
+            "💖 Dünyanın en güzel gülüşüne sahip kişiye kocaman bir sarılma ödülü!",
+            "🎶 En sevdiğin şarkıyı aç ve benimle dans et!",
+            "👑 Bugün tüm kaprislerin ve isteklerin başımın üstüne!",
+            "💌 Sana özel yazılmış gizli bir şiir: 'Gözlerin gökyüzü, kalbin evim oldu...'",
+            "🍕 En sevdiğin restoranda akşam yemeği randevusu kazandın!"
+        ];
+
+        function spinWheel() {
+            const resultBox = document.getElementById("wheelResult");
+            resultBox.innerHTML = "Şansın dönüyor... 🌀";
+            
+            let counter = 0;
+            const interval = setInterval(() => {
+                const randomIndex = Math.floor(Math.random() * surprises.length);
+                resultBox.innerHTML = surprises[randomIndex];
+                counter++;
+                if (counter > 10) {
+                    clearInterval(interval);
+                    const finalIndex = Math.floor(Math.random() * surprises.length);
+                    resultBox.innerHTML = surprises[finalIndex];
+                    confetti({
+                        particleCount: 80,
+                        spread: 70,
+                        origin: { y: 0.7 }
+                    });
+                }
+            }, 80);
+        }
+
+        /* 8. CANVAS BÜYÜLÜ PARÇACIKLAR */
         const canvas = document.getElementById("particleCanvas");
         const ctx = canvas.getContext("2d");
 
