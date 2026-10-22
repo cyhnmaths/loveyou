@@ -281,6 +281,60 @@
             cursor: pointer;
         }
 
+        /* KAZI KAZAN STİLLERİ */
+        .scratch-container {
+            position: relative;
+            width: 100%;
+            max-width: 340px;
+            height: 180px;
+            margin: 20px auto 10px auto;
+            border-radius: 20px;
+            overflow: hidden;
+            border: 2px dashed var(--gold);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            touch-action: none;
+        }
+
+        .scratch-secret {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(255, 42, 109, 0.2) 0%, rgba(255, 215, 0, 0.2) 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            box-sizing: border-box;
+            z-index: 1;
+        }
+
+        .scratch-secret i {
+            font-size: 2rem;
+            color: var(--gold);
+            margin-bottom: 8px;
+        }
+
+        .scratch-secret p {
+            color: #fff;
+            font-weight: 700;
+            font-size: 1.1rem;
+            text-align: center;
+            line-height: 1.4;
+        }
+
+        #scratchCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+            cursor: pointer;
+        }
+
         /* İNTERAKTİF SORU & EĞLENCE BÖLÜMÜ */
         .question-card {
             background: var(--glass-bg);
@@ -383,19 +437,20 @@
         </div>
     </section>
 
-    <!-- OYUN BÖLÜMÜ: SÜRPRİZ ŞANS ÇARKI -->
+    <!-- OYUN BÖLÜMÜ: DİJİTAL KAZI KAZAN -->
     <section>
         <div class="question-card">
-            <i class="fa-solid fa-dice" style="font-size: 2.5rem; color: var(--gold); margin-bottom: 15px;"></i>
-            <h2 style="font-size: 1.4rem; margin-bottom: 10px;">Sürpriz Şans Çarkı</h2>
-            <p style="color: var(--text-sub); font-size: 0.95rem; margin-bottom: 20px;">Bugün senin için hangi sürpriz var? Butona bas ve şansını dene! ✨</p>
+            <i class="fa-solid fa-hand-pointer" style="font-size: 2.3rem; color: var(--gold); margin-bottom: 12px;"></i>
+            <h2 style="font-size: 1.4rem; margin-bottom: 8px;">Aşk Kazı Kazanı ✨</h2>
+            <p style="color: var(--text-sub); font-size: 0.9rem;">Gri alanı parmağınla veya farenle kazıyarak gizli sürprizini ortaya çıkar!</p>
             
-            <!-- Çark Sonuç Alanı -->
-            <div id="wheelResult" style="min-height: 70px; background: rgba(0,0,0,0.3); border: 1px dashed var(--glass-border); border-radius: 16px; padding: 15px; display: flex; align-items: center; justify-content: center; color: var(--gold); font-weight: 600; font-size: 1rem; text-align: center; margin-bottom: 20px;">
-                "Şansımı Çevir" butonuna dokunarak sürprizini öğren! 🎁
+            <div class="scratch-container">
+                <div class="scratch-secret">
+                    <i class="fa-solid fa-gift"></i>
+                    <p id="scratchText">🎟️ Sınırsız Kahve & Tatlı Ismarlama Hakkı Kazandın! ❤️</p>
+                </div>
+                <canvas id="scratchCanvas"></canvas>
             </div>
-
-            <button class="btn btn-yes" onclick="spinWheel()" style="width: 100%;">Şansımı Çevir 🎡</button>
         </div>
     </section>
 
@@ -464,6 +519,8 @@
 
         /* 3. MOBİL DOKUNMATİK KALP YAĞMURU EFEKTİ */
         document.addEventListener("touchstart", function(e) {
+            // Kazı kazan alanına dokunulduğunda kalp oluşturmayı engelle
+            if(e.target.id === 'scratchCanvas') return;
             createHeart(e.touches[0].clientX, e.touches[0].clientY);
         });
 
@@ -523,38 +580,75 @@
             }, 400);
         }
 
-        /* 7. OYUN MANTIĞI: SÜRPRİZ ŞANS ÇARKI */
-        const surprises = [
-            "🎟️ 1 Adet Sınırsız Kahve / Tatlı Ismarlama Hakkı Kazandın!",
-            "🎬 Bu akşamki film seçimini veto yetkisi olmadan yapma hakkı!",
-            "💖 Dünyanın en güzel gülüşüne sahip kişiye kocaman bir sarılma ödülü!",
-            "🎶 En sevdiğin şarkıyı aç ve benimle dans et!",
-            "👑 Bugün tüm kaprislerin ve isteklerin başımın üstüne!",
-            "💌 Sana özel yazılmış gizli bir şiir: 'Gözlerin gökyüzü, kalbin evim oldu...'",
-            "🍕 En sevdiğin restoranda akşam yemeği randevusu kazandın!"
-        ];
+        /* 7. OYUN MANTIĞI: DİJİTAL KAZI KAZAN */
+        const scratchCanvas = document.getElementById("scratchCanvas");
+        const sCtx = scratchCanvas.getContext("2d");
+        let isScratching = false;
+        let hasCelebrated = false;
 
-        function spinWheel() {
-            const resultBox = document.getElementById("wheelResult");
-            resultBox.innerHTML = "Şansın dönüyor... 🌀";
-            
-            let counter = 0;
-            const interval = setInterval(() => {
-                const randomIndex = Math.floor(Math.random() * surprises.length);
-                resultBox.innerHTML = surprises[randomIndex];
-                counter++;
-                if (counter > 10) {
-                    clearInterval(interval);
-                    const finalIndex = Math.floor(Math.random() * surprises.length);
-                    resultBox.innerHTML = surprises[finalIndex];
-                    confetti({
-                        particleCount: 80,
-                        spread: 70,
-                        origin: { y: 0.7 }
-                    });
-                }
-            }, 80);
+        function initScratch() {
+            scratchCanvas.width = scratchCanvas.parentElement.offsetWidth;
+            scratchCanvas.height = scratchCanvas.parentElement.offsetHeight;
+
+            // Şık gümüş-mor kaplama katmanı
+            const grad = sCtx.createLinearGradient(0, 0, scratchCanvas.width, scratchCanvas.height);
+            grad.addColorStop(0, '#2e1c48');
+            grad.addColorStop(0.5, '#4a2372');
+            grad.addColorStop(1, '#1b0b2e');
+            sCtx.fillStyle = grad;
+            sCtx.fillRect(0, 0, scratchCanvas.width, scratchCanvas.height);
+
+            // Üzerine yönlendirme yazısı ve ikonlar çizme
+            sCtx.fillStyle = '#ffd700';
+            sCtx.font = 'bold 16px "Plus Jakarta Sans", sans-serif';
+            sCtx.textAlign = 'center';
+            sCtx.fillText('Burayı Kazı ✨', scratchCanvas.width / 2, scratchCanvas.height / 2 + 5);
         }
+
+        function scratch(e) {
+            if (!isScratching) return;
+            const rect = scratchCanvas.getBoundingClientRect();
+            const x = (e.clientX || (e.touches && e.touches[0].clientX)) - rect.left;
+            const y = (e.clientY || (e.touches && e.touches[0].clientY)) - rect.top;
+
+            sCtx.globalCompositeOperation = 'destination-out';
+            sCtx.beginPath();
+            sCtx.arc(x, y, 22, 0, Math.PI * 2);
+            sCtx.fill();
+
+            checkScratchProgress();
+        }
+
+        function checkScratchProgress() {
+            if (hasCelebrated) return;
+            // Kazınan alan miktarını kontrol etme
+            const imgData = sCtx.getImageData(0, 0, scratchCanvas.width, scratchCanvas.height);
+            let clearedPixels = 0;
+            for (let i = 3; i < imgData.data.length; i += 4) {
+                if (imgData.data[i] === 0) clearedPixels++;
+            }
+            const progress = clearedPixels / (imgData.data.length / 4);
+
+            // %40'tan fazlası kazındıysa konfeti patlat
+            if (progress > 0.4) {
+                hasCelebrated = true;
+                confetti({
+                    particleCount: 80,
+                    spread: 70,
+                    origin: { y: 0.7 }
+                });
+            }
+        }
+
+        scratchCanvas.addEventListener('mousedown', (e) => { isScratching = true; scratch(e); });
+        scratchCanvas.addEventListener('mousemove', scratch);
+        window.addEventListener('mouseup', () => { isScratching = false; });
+
+        scratchCanvas.addEventListener('touchstart', (e) => { isScratching = true; scratch(e); });
+        scratchCanvas.addEventListener('touchmove', scratch);
+        window.addEventListener('touchend', () => { isScratching = false; });
+
+        window.addEventListener('load', initScratch);
 
         /* 8. CANVAS BÜYÜLÜ PARÇACIKLAR */
         const canvas = document.getElementById("particleCanvas");
