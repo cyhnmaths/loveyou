@@ -206,7 +206,7 @@
             display: block;
         }
 
-        /* INTERAKTİF HEEDİYE KUTUSU (SURPRISE BOX) */
+        /* İNTERAKTİF HEDİYE KUTUSU (SURPRISE BOX) */
         .gift-container {
             margin-top: 30px;
             cursor: pointer;
@@ -379,9 +379,148 @@
             position: absolute;
             transition: all 0.2s ease;
         }
+
+        /* GİRİŞ ONAY POPUP (EKLENEN ÖZELLİK) */
+        .disclaimer-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(5, 2, 10, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            z-index: 10000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            opacity: 1;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+
+        .disclaimer-modal {
+            background: linear-gradient(145deg, rgba(30, 15, 45, 0.98), rgba(15, 5, 25, 0.98));
+            border: 2px solid var(--primary);
+            border-radius: 28px;
+            padding: 35px 25px;
+            max-width: 440px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 0 50px var(--primary-glow);
+            animation: modalPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes modalPop {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .disclaimer-icon {
+            font-size: 3.5rem;
+            color: var(--primary);
+            margin-bottom: 15px;
+            filter: drop-shadow(0 0 15px var(--primary-glow));
+        }
+
+        .disclaimer-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 12px;
+        }
+
+        .disclaimer-text {
+            color: var(--text-sub);
+            font-size: 0.92rem;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            padding: 14px 16px;
+            border-radius: 16px;
+            cursor: pointer;
+            text-align: left;
+            margin-bottom: 25px;
+            transition: all 0.3s ease;
+        }
+
+        .checkbox-container:hover {
+            border-color: var(--primary);
+            background: rgba(255, 42, 109, 0.1);
+        }
+
+        .checkbox-container input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            accent-color: var(--primary);
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .checkbox-container label {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            cursor: pointer;
+            line-height: 1.4;
+        }
+
+        .disclaimer-btn {
+            width: 100%;
+            padding: 15px;
+            border-radius: 30px;
+            border: none;
+            background: linear-gradient(135deg, var(--primary) 0%, #ff6b81 100%);
+            color: #fff;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            box-shadow: 0 8px 25px var(--primary-glow);
+            transition: all 0.3s ease;
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        .disclaimer-btn.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .disclaimer-btn.active:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 30px var(--primary-glow);
+        }
     </style>
 </head>
 <body>
+
+    
+    <div class="disclaimer-overlay" id="disclaimerOverlay">
+        <div class="disclaimer-modal">
+            <div class="disclaimer-icon">
+                <i class="fa-solid fa-heart-circle-check"></i>
+            </div>
+            <h2 class="disclaimer-title">Önemli Bir Duyuru & Onay</h2>
+            <p class="disclaimer-text">
+                Bu web sitesi yüksek dozda sevgi, romantizm ve özel anılar içermektedir. Devam edebilmek için aşağıdaki şartı tamamen kabul etmeniz gerekmektedir:
+            </p>
+            
+            <div class="checkbox-container" onclick="toggleDisclaimerCheckbox()">
+                <input type="checkbox" id="loveCheckbox">
+                <label for="loveCheckbox">Seni çok sevdiğimi okudum, anladım ve ben de seni çok <b>SEVİYORUM</b>. ❤️</label>
+            </div>
+
+            <button class="disclaimer-btn" id="disclaimerBtn" onclick="acceptDisclaimer()" disabled>
+                Giriş Yap & Sürprizi Gör ✨
+            </button>
+        </div>
+    </div>
 
     <!-- Arkaplan Büyülü Işık Parçacıkları -->
     <canvas id="particleCanvas"></canvas>
@@ -480,6 +619,39 @@
     </div>
 
     <script>
+        /* 0. ONAY POPUP MANTIĞI */
+        const loveCheckbox = document.getElementById("loveCheckbox");
+        const disclaimerBtn = document.getElementById("disclaimerBtn");
+        const disclaimerOverlay = document.getElementById("disclaimerOverlay");
+
+        loveCheckbox.addEventListener("change", function () {
+            if (this.checked) {
+                disclaimerBtn.classList.add("active");
+                disclaimerBtn.removeAttribute("disabled");
+            } else {
+                disclaimerBtn.classList.remove("active");
+                disclaimerBtn.setAttribute("disabled", "true");
+            }
+        });
+
+        function toggleDisclaimerCheckbox() {
+            loveCheckbox.checked = !loveCheckbox.checked;
+            loveCheckbox.dispatchEvent(new Event("change"));
+        }
+
+        function acceptDisclaimer() {
+            disclaimerOverlay.style.opacity = "0";
+            disclaimerOverlay.style.visibility = "hidden";
+
+            if (typeof confetti === "function") {
+                confetti({
+                    particleCount: 100,
+                    spread: 80,
+                    origin: { y: 0.5 }
+                });
+            }
+        }
+
         /* 1. MÜZİK KONTROLÜ */
         const audio = document.getElementById("bgAudio");
         const musicBtn = document.getElementById("musicBtn");
@@ -519,7 +691,6 @@
 
         /* 3. MOBİL DOKUNMATİK KALP YAĞMURU EFEKTİ */
         document.addEventListener("touchstart", function(e) {
-            // Kazı kazan alanına dokunulduğunda kalp oluşturmayı engelle
             if(e.target.id === 'scratchCanvas') return;
             createHeart(e.touches[0].clientX, e.touches[0].clientY);
         });
@@ -590,7 +761,6 @@
             scratchCanvas.width = scratchCanvas.parentElement.offsetWidth;
             scratchCanvas.height = scratchCanvas.parentElement.offsetHeight;
 
-            // Şık gümüş-mor kaplama katmanı
             const grad = sCtx.createLinearGradient(0, 0, scratchCanvas.width, scratchCanvas.height);
             grad.addColorStop(0, '#2e1c48');
             grad.addColorStop(0.5, '#4a2372');
@@ -598,7 +768,6 @@
             sCtx.fillStyle = grad;
             sCtx.fillRect(0, 0, scratchCanvas.width, scratchCanvas.height);
 
-            // Üzerine yönlendirme yazısı ve ikonlar çizme
             sCtx.fillStyle = '#ffd700';
             sCtx.font = 'bold 16px "Plus Jakarta Sans", sans-serif';
             sCtx.textAlign = 'center';
@@ -621,7 +790,6 @@
 
         function checkScratchProgress() {
             if (hasCelebrated) return;
-            // Kazınan alan miktarını kontrol etme
             const imgData = sCtx.getImageData(0, 0, scratchCanvas.width, scratchCanvas.height);
             let clearedPixels = 0;
             for (let i = 3; i < imgData.data.length; i += 4) {
@@ -629,7 +797,6 @@
             }
             const progress = clearedPixels / (imgData.data.length / 4);
 
-            // %40'tan fazlası kazındıysa konfeti patlat
             if (progress > 0.4) {
                 hasCelebrated = true;
                 confetti({
